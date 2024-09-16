@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('alamat');
             $table->string('nohp');
             $table->string('foto');
+            $table->string('role');
             $table->string('main_job');
             $table->string('other_job');
             $table->string('status');

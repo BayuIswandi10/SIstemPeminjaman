@@ -15,13 +15,13 @@ return new class extends Migration
     {
         Schema::create('peminjaman_barangs', function (Blueprint $table) {
             $table->id('peminjaman_barang_id');
+            $table->string('no_pengajuan');
             $table->string('nim_peminjaman');
             $table->string('nama_peminjam');
             $table->date('tanggal_pinjam');
             $table->foreignId('sesi_id')->constrained('sesis', 'sesi_id');          
             $table->string('keperluan');
             $table->string('foto_sebelum')->nullable();
-            $table->date('tanggal_kembali')->nullable();
             $table->time('waktu_kembali')->nullable();
             $table->string('foto_setelah')->nullable();
             $table->string('status');

@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Requests\UpdatePenggunaRequest;
+
 use Illuminate\Validation\Rule;
 
 class UpdatePenggunaRequest extends FormRequest
@@ -33,11 +33,29 @@ class UpdatePenggunaRequest extends FormRequest
             'alamat'=>['required'],
             'nohp'=>['required'],
             'foto' => '|image|mimes:jpeg,png,jpg|max:2048',
+            'role'=>['required'],
             'main_job'=>['required'],
             'other_job'=>['required'],
             'status',
             'username',
             'password',
+        ];  
+    }
+
+    public function messages()
+    {
+        return [
+            'nama.required' => 'Nama wajib diisi.',
+            'nama.max' => 'Nama tidak boleh melebihi :max karakter.',
+            'alamat.required' => 'Alamat wajib diisi.',
+            'nohp.required' => 'Nomor HP wajib diisi.',
+            'foto.image' => 'Foto harus berupa file gambar.',
+            'foto.mimes' => 'Format foto harus jpeg, png, atau jpg.',
+            'foto.max' => 'Ukuran foto tidak boleh melebihi :max kilobita.',
+            'role.required' => 'Role wajib diisi.',
+            'main_job.required' => 'Main Job wajib diisi.',
+            'other_job.required' => 'Other Job wajib diisi.',
+            // You can add more custom messages for other fields if needed
         ];
     }
 }

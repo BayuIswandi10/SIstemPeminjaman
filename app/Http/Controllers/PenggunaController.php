@@ -2,20 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 
-use App\Models\Barang;
-use App\Models\Fasilitas;
 use App\Models\Pengguna;
-use App\Models\Sesi;
-use App\Models\Ruangan;
-use App\Models\PeminjamanBarang;
-use App\Models\PeminjamanRuangan;
-
+use Illuminate\Support\Facades\File;
 use App\Http\Requests\StorePenggunaRequest;
 use App\Http\Requests\UpdatePenggunaRequest;
 
-use Illuminate\Support\Facades\Storage;
 
 class PenggunaController extends Controller
 {
@@ -54,23 +46,15 @@ class PenggunaController extends Controller
         $existingUsername = Pengguna::where('username', $request->username)->first();
         if ($existingUsername) {
             return redirect()->back()->with('error', 'Username sudah ada.')->withInput();
-            // Redirect back to the create form with an error message
-            // You can customize this based on your Swal.fire configuration
-        }
-        
-        // Upload dan simpan gambar ke storage jika ada file yang diunggah
-        if ($request->hasFile('foto')) {
-            $image = $request->file('foto');
-            $path=$image->store('pengguna_photos');
-            $params['foto'] = $path;
-            // Simpan lokasi gambar ke database
-            // $pengguna->image = 'pengguna_images/' . $imageName;
-            // $pengguna->save();
         }
 
-        $pengguna = Pengguna::create($params);
+        $imageName = time() . '.' . $request->foto->extension();
+        $uploadedImage = $request->foto->move(public_path('assets/foto/admin'), $imageName);
+        $imagePath = 'assets/foto/admin/' . $imageName;
 
-        if ($pengguna) {
+        if ($pengguna = Pengguna::create($params)) {
+            $pengguna->foto = $imagePath;
+            $pengguna->save();
             return redirect(route('pengguna.index'))->with('success', 'Data berhasil ditambahkan!');
         } else {
             return redirect()->back()->with('error', 'Gagal menambahkan data. Silakan coba lagi.');
@@ -112,35 +96,27 @@ class PenggunaController extends Controller
     {
         $pengguna = Pengguna::findOrFail($id);
         $params = $request->validated();
-    
-        $oldImagePath = $pengguna->foto; // Kolom gambar pada tabel mahasiswa
-    
+        
+        // Simpan gambar baru
         if ($request->hasFile('foto')) {
-            $image = $request->file('foto');
-            
-            // Simpan gambar baru
-            $path = $image->store('pengguna_photos');
-            $params['foto'] = $path;
+            $newImage = $request->file('foto');
+            $imageName = time() . '.' . $newImage->extension();
+            $newImage->move(public_path('assets/foto/admin'), $imageName);
+            $newImagePath = 'assets/foto/admin/' . $imageName;
     
-            if ($oldImagePath && Storage::exists($oldImagePath)) {
-                // Hapus gambar lama dari storage jika ada
-                Storage::delete($oldImagePath);
+            // Hapus gambar lama jika ada
+            if ($pengguna->foto && File::exists(public_path($pengguna->foto))) {
+                File::delete(public_path($pengguna->foto));
             }
+    
+            $params['foto'] = $newImagePath;
         }
     
-        // Lakukan pembaruan data mahasiswa
+        // Lakukan pembaruan data pengguna
         if ($pengguna->update($params)) {
-            return redirect(route('pengguna.index'))->with('success', 'Updated!');
+            return redirect(route('pengguna.index'))->with('success', 'Data berhasil diubah!');
         } else {
-            // Jika terjadi kesalahan saat pembaruan mahasiswa
-            if ($request->hasFile('foto')) {
-                $newImagePath = $params['foto'] ?? null;
-                if ($newImagePath && Storage::exists($newImagePath)) {
-                    Storage::delete($newImagePath);
-                }
-            }
-    
-            // Kembalikan ke halaman sebelumnya dengan pesan kesalahan
+            // Jika terjadi kesalahan saat pembaruan pengguna
             return back()->with('error', 'Failed to update pengguna.');
         }
     }
@@ -152,17 +128,18 @@ class PenggunaController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function destroy($id)
-    {
-        $pengguna = Pengguna::find($id);
-
-        if ($pengguna) {
-            $pengguna->status = 'Tidak Aktif';
-            $pengguna->save();
-    
-            return redirect()->route('pengguna.index')->with('success', 'Data ID ' . $id . ' successfully set to inactive status.');
-        }
-    
-        return redirect()->route('pengguna.index')->with('error', 'Data not found.');
-    }
+     public function destroy($id)
+     {
+         $pengguna = Pengguna::find($id);
+     
+         if ($pengguna) {
+             $pengguna->status = 'Tidak Aktif';
+             $pengguna->save();
+     
+             return redirect()->route('pengguna.index')->with('success', 'Data ID ' . $id . ' berhasil dihapus!');
+         }
+     
+         return redirect()->route('pengguna.index')->with('error', 'Data not found.');
+     }
+     
 }

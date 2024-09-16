@@ -37,6 +37,7 @@ return new class extends Migration
             $table->foreignId('ruangan_id')->constrained('ruangans', 'ruangan_id');
             $table->foreignId('fasilitas_id')->constrained('fasilitas', 'fasilitas_id');
             $table->integer('jumlah');
+            $table->string('kondisi')->nullable();
             $table->timestamps(false); // Menonaktifkan timestamps
         });
     }

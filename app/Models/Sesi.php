@@ -7,13 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sesi extends Model
 {
+    protected $primaryKey = 'sesi_id';
+    protected $table = 'sesis';
     public $timestamps = false;
     use HasFactory;
     protected $fillable=[
         'nama_sesi',
         'sesi_awal',
         'sesi_akhir',
-        'pengguna_id',
+        'created_by',
         'created_date',
         'status',
     ];

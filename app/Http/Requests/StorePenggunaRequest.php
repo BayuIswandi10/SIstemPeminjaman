@@ -24,15 +24,28 @@ class StorePenggunaRequest extends FormRequest
     public function rules()
     {
         return [
-            'nama'=>['required','max:100'],
-            'alamat'=>['required'],
-            'nohp'=>['required'],
+            'nama' => ['required', 'max:250'],
+            'alamat' => ['required', 'max:250'],
+            'nohp' => ['required', 'max:250'],
             'foto' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'main_job'=>['required'],
-            'other_job'=>['required'],
-            'status'=>['required'],
-            'username'=>['required'],
-            'password'=>['required'],
+            'role' => ['required', 'max:250'],
+            'main_job' => ['required', 'max:250'],
+            'other_job' => ['required', 'max:250'],
+            'status' => ['required', 'max:250'],
+            'username' => ['required', 'max:250'],
+            'password' => ['required', 'max:250'],
+        ];
+    }
+    
+
+    public function messages()
+    {
+        return [
+            'required' => 'Kolom :attribute harus diisi.',
+            'max' => 'Kolom :attribute tidak boleh lebih dari :max karakter.',
+            'image' => 'Kolom :attribute harus berupa gambar.',
+            'mimes' => 'Kolom :attribute harus berupa file dengan tipe: :values.',
+            'max' => 'Kolom :attribute tidak boleh lebih dari :max kilobita.',
         ];
     }
 }

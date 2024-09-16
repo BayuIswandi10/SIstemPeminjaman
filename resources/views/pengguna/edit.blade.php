@@ -9,13 +9,13 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                <h1 class="m-0">Admin</h1>
+                <h1 class="m-0">User</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#">Menu</a></li>
                     <li class="breadcrumb-item">Data</li>
-                    <li class="breadcrumb-item">Admin</li>
+                    <li class="breadcrumb-item">User</li>
                     <li class="breadcrumb-item">Edit</li>
 
                 </ol>
@@ -71,27 +71,29 @@
                                     <input type="number" class="form-control" name="nohp" value="{{ $pengguna->nohp }}" placeholder="Masukkan Nomor Telepon Admin" minlength="11" maxlength="13" />
                                 </div>
                                 <div class="form-group">
+                                    <label for="role">Role <span style="color:red;">*</span></label><br>
+                                    <select class="form-control" name="role" aria-label="Default select example" required>
+                                        <option disabled>-- Pilih Role --</option>
+                                        <option value="Super Admin" {{ $pengguna->role == 'Super Admin' ? 'selected' : '' }}>Super Admin</option>
+                                        <option value="Koor UPT" {{ $pengguna->role == 'Koor UPT' ? 'selected' : '' }}>Koor UPT</option>
+                                        <option value="PIC Lab" {{ $pengguna->role == 'PIC Lab' ? 'selected' : '' }}>PIC Lab</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="main_job">Main Job <span style="color:red;">*</span></label>
+                                    <input type="text" class="form-control" value="{{ $pengguna->main_job }}" name="main_job" placeholder="Masukkan Pekerjaan Lain" />
+                                </div>
+                                <div class="form-group">
                                     <label for="other_job">Other Job <span style="color:red;">*</span></label>
                                     <input type="text" class="form-control" value="{{ $pengguna->other_job }}" name="other_job" placeholder="Masukkan Pekerjaan Lain" />
                                 </div>
                                 <div class="form-group">
-                                    <label for="main_job">Role <span style="color:red;">*</span></label><br>
-                                    <select class="form-control" value="{{ $pengguna->main_job }}" name="main_job" aria-label="Default select example" required>
-                                    <option selected value="" disabled>-- Pilih Role --</option>
-                                    <option value="Super Admin">Super Admin</option>
-                                    <option value="Koor UPT">Koor UPT</option>
-                                    <option value="PIC Lab">PIC Lab</option>
-                                    <option value="Admin Lab 1">Admin Lab 1</option>
-                                    <option value="Admin Lab 2">Admin Lab 2</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="foto" id="lblfoto">Foto Admin <span class="form-group-text" style="color:red;">*</span></label><br>
+                                    <label for="foto" id="foto">Foto <span class="form-group-text" style="color:red;">*</span></label><br>
                                     <div class="custom-file">
-                                        <input type="hidden" class="form-control" id="foto" name="foto" />
-                                        <input type="file" id="foto" name="foto" class="custom-file-input" aria-describedby="lblfoto" />
-                                    <label class="custom-file-label" for="foto">Pilih file</label>
-                                    <img src="{{ asset('storage/' . $pengguna->foto) }}" class="img-thumbnail" style="width:200px" />
+                                        <input type="file" id="foto" name="foto" class="custom-file-input" aria-describedby="foto" onchange="validateImage(this);" />
+                                        <label class="custom-file-label" for="foto">Pilih file</label>
+                                    </div>
+                                    <img id="image-preview" class="img-thumbnail mt-2" style="max-width: 100%;" src="{{ asset($pengguna->foto) }}" />
                                 </div>
                                 <div class="form-group" hidden>
                                     <label for="status">Status <span style="color:red;">*</span></label>
@@ -112,5 +114,64 @@
         </div> 
     </section>
 </div>   
+
+<script>
+    // Display validation errors in Swal
+    @if ($errors->any())
+    Swal.fire({
+        icon: 'error',
+        title: 'Whoops!',
+        html: '<ul>' +
+            @foreach ($errors->all() as $error)
+                '<li>{{ $error }}</li>' +
+            @endforeach
+            '</ul>'
+        });
+    @endif
+
+    // Display success message in Swal
+    @if (session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '{{ session('success') }}'
+        });
+    @endif
+
+    // Display error message in Swal
+    @if (session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: '{{ session('error') }}'
+        });
+    @endif
+    
+    function validateImage(input) {
+        var allowedFormats = ['image/png', 'image/jpg', 'image/jpeg'];
+        var file = input.files[0];
+
+        if (file) {
+            if (allowedFormats.includes(file.type)) {
+                var preview = document.getElementById('image-preview');
+                var reader = new FileReader();
+
+                reader.onloadend = function () {
+                    preview.src = reader.result;
+                }
+
+                reader.readAsDataURL(file);
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Format file tidak valid. Pilih file dengan format PNG, JPG, atau JPEG.',
+                    icon: 'error'
+                });
+                input.value = ''; // Clear the input to prevent submission of an invalid file
+                document.getElementById('image-preview').src = ''; // Clear the preview
+            }
+        }
+    }
+</script>
 
 @endsection

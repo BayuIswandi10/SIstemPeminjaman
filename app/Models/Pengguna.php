@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Hash;
 
-class Pengguna extends Model
+class Pengguna extends Authenticatable
 {
     protected $primaryKey = 'pengguna_id';
+    protected $table = 'penggunas';
     public $timestamps = false;
     use HasFactory;
     protected $fillable=[
@@ -15,12 +17,18 @@ class Pengguna extends Model
         'alamat',
         'nohp',
         'foto',
+        'role',
         'main_job',
         'other_job',
         'status',
         'username',
         'password',
     ];
+
+    public function setPasswordAttribute($password)
+    {
+        $this->attributes['password'] = Hash::make($password);
+    }
 
     public function fasilitas(){
         return $this->hasMany(Fasilitas::class);
